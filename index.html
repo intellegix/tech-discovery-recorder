@@ -394,6 +394,7 @@
             <p class="subtitle">Local audio recording + Claude AI transcription for compliant technical discovery</p>
         </header>
 
+
         <div class="legal-banner">
             <strong>⚖️ California Compliance:</strong> This system ensures all-party consent + local processing. Start every call with: <em>"I'm recording this on my phone for technical documentation. This recording will be transcribed using my own AI processing. Does everyone consent?"</em>
         </div>
@@ -745,7 +746,7 @@ Structured Notes
 
     <script>
         // API Configuration
-        const API_BASE_URL = 'http://localhost:8000/api/v1';
+        const API_BASE_URL = 'https://tech-discovery-recorder-api.onrender.com/api/v1'; // Production backend URL
         let authToken = null;
 
         // State management
@@ -758,8 +759,7 @@ Structured Notes
         // API Helper Functions
         async function checkAPIHealth() {
             try {
-                const response = await fetch(`${API_BASE_URL}/health`);
-                const data = await response.json();
+                const data = await apiRequest('/health');
                 document.getElementById('api-status').textContent =
                     data.status === 'healthy' ? '✅ Connected' : '⚠️ Degraded';
                 return data.status === 'healthy';
