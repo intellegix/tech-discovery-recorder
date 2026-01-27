@@ -7,6 +7,7 @@
 
 # API Keys (keep these secure)
 *.txt
+!requirements.txt  # Allow requirements.txt for deployment
 api_keys/
 secrets/
 
