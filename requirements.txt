@@ -33,7 +33,7 @@ httpx==0.25.2
 requests==2.31.0
 
 # CORS and Middleware
-starlette==0.27.0
+# starlette version managed by fastapi
 
 # Utilities
 python-dateutil==2.8.2
