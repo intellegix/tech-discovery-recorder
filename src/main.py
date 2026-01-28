@@ -33,14 +33,39 @@ async def lifespan(app: FastAPI):
     """Application lifespan management."""
     logger.info("Starting Tech Discovery Recorder backend")
 
-    # Initialize database tables
+    # Initialize database tables with retry logic
     logger.info("Initializing database...")
-    db_init_result = await database_service.create_tables()
-    if db_init_result.is_err():
-        logger.error(f"Failed to initialize database: {db_init_result.unwrap_or('Unknown error')}")
-        raise Exception("Database initialization failed")
+    max_retries = 5
+    retry_delay = 2
 
-    logger.info("Database initialized successfully")
+    for attempt in range(max_retries):
+        try:
+            db_init_result = await database_service.create_tables()
+            if db_init_result.is_ok():
+                logger.info("Database initialized successfully")
+                break
+            else:
+                error = db_init_result.unwrap_err()
+                logger.warning(f"Database initialization attempt {attempt + 1}/{max_retries} failed: {error}")
+                if attempt == max_retries - 1:
+                    logger.error(f"Failed to initialize database after {max_retries} attempts: {error}")
+                    raise Exception(f"Database initialization failed after {max_retries} attempts: {error}")
+
+                # Wait before retry
+                import asyncio
+                await asyncio.sleep(retry_delay)
+                retry_delay *= 1.5  # Exponential backoff
+        except Exception as e:
+            logger.warning(f"Database initialization attempt {attempt + 1}/{max_retries} failed with exception: {e}")
+            if attempt == max_retries - 1:
+                logger.error(f"Failed to initialize database after {max_retries} attempts: {e}")
+                raise Exception(f"Database initialization failed after {max_retries} attempts: {e}")
+
+            # Wait before retry
+            import asyncio
+            await asyncio.sleep(retry_delay)
+            retry_delay *= 1.5  # Exponential backoff
+
     logger.info(f"Server ready on port 8000 (debug={settings.debug})")
 
     yield  # Server is running
