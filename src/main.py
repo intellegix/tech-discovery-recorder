@@ -4,12 +4,14 @@ Implements the backend architecture from the plan.
 """
 
 import logging
+import os
 from contextlib import asynccontextmanager
 from typing import Dict, Any
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 
 from .config.settings import settings
@@ -29,7 +31,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan management."""
-    logger.info("🚀 Starting Tech Discovery Recorder backend")
+    logger.info("Starting Tech Discovery Recorder backend")
 
     # Initialize database tables
     logger.info("Initializing database...")
@@ -38,12 +40,12 @@ async def lifespan(app: FastAPI):
         logger.error(f"Failed to initialize database: {db_init_result.unwrap_or('Unknown error')}")
         raise Exception("Database initialization failed")
 
-    logger.info("✅ Database initialized successfully")
-    logger.info(f"🎯 Server ready on port 8000 (debug={settings.debug})")
+    logger.info("Database initialized successfully")
+    logger.info(f"Server ready on port 8000 (debug={settings.debug})")
 
     yield  # Server is running
 
-    logger.info("🛑 Shutting down Tech Discovery Recorder backend")
+    logger.info("Shutting down Tech Discovery Recorder backend")
 
 
 # Create FastAPI application
@@ -96,6 +98,15 @@ if settings.is_production:
     )
 
 
+# Mount static files
+static_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+if os.path.exists(static_path):
+    app.mount("/static", StaticFiles(directory=static_path), name="static")
+    logger.info(f"Static files mounted from: {static_path}")
+else:
+    logger.warning(f"Static directory not found: {static_path}")
+
+
 # Include routers
 app.include_router(recordings.router)
 app.include_router(admin.router)
@@ -146,14 +157,31 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
     )
 
 
-# Root endpoint
+# Root endpoint - serve HTML interface for browsers, JSON for API clients
 @app.get(
     "/",
-    summary="API Root",
-    description="Get API information and health status"
+    summary="Tech Discovery Recorder Interface",
+    description="Serve the web interface for browsers or API information for API clients"
 )
-async def root() -> Dict[str, Any]:
-    """API root endpoint with basic information."""
+async def root(request: Request):
+    """Root endpoint - serves HTML interface or API information."""
+    # Check if this is a browser request (Accept header contains text/html)
+    accept_header = request.headers.get("accept", "")
+
+    if "text/html" in accept_header:
+        # Browser request - serve HTML interface
+        static_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static", "index.html")
+        if os.path.exists(static_path):
+            return FileResponse(static_path, media_type="text/html")
+        else:
+            logger.warning(f"HTML file not found: {static_path}")
+            # Fallback to inline HTML
+            return FileResponse(
+                path=os.path.join(os.path.dirname(os.path.dirname(__file__)), "Tech Discovery Recorder.html"),
+                media_type="text/html"
+            )
+
+    # API request - return JSON information
     return {
         "service": "Tech Discovery Recorder API",
         "version": settings.app_version,

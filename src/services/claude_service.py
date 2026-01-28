@@ -23,31 +23,9 @@ except ImportError:
 # Optional imports for Claude API integration
 try:
     import anthropic
-    from langchain_anthropic import ChatAnthropic
-    # Try multiple import paths for different LangChain versions
-    try:
-        from langchain.schema import HumanMessage, SystemMessage
-    except ImportError:
-        from langchain_core.messages import HumanMessage, SystemMessage
-
-    # Prompts are optional - we can work without them
-    try:
-        from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
-    except ImportError:
-        ChatPromptTemplate = None
-        SystemMessagePromptTemplate = None
-        HumanMessagePromptTemplate = None
-
     CLAUDE_API_AVAILABLE = True
 except ImportError as e:
-    # Don't reference logger since it's not defined yet
     anthropic = None
-    ChatAnthropic = None
-    HumanMessage = None
-    SystemMessage = None
-    ChatPromptTemplate = None
-    SystemMessagePromptTemplate = None
-    HumanMessagePromptTemplate = None
     CLAUDE_API_AVAILABLE = False
 
 from ..config.settings import settings
@@ -86,17 +64,11 @@ class ClaudeService:
             settings.claude_api_key.startswith('sk-ant-') and
             len(settings.claude_api_key) > 20):
             self.client = anthropic.Anthropic(api_key=settings.claude_api_key)
-            self.langchain_client = ChatAnthropic(
-                anthropic_api_key=settings.claude_api_key,
-                model=settings.claude_model,
-                max_tokens=settings.claude_max_tokens,
-                temperature=0.3  # Balanced temperature for creative yet accurate analysis
-            )
             self.is_demo_mode = False
+            logger.info("ClaudeService initialized with real API")
         else:
             # Demo mode - no real API calls
             self.client = None
-            self.langchain_client = None
             self.is_demo_mode = True
             logger.warning("Running in demo mode - Claude API not configured")
 
@@ -610,7 +582,7 @@ IMPORTANT GUIDELINES:
         return Ok(prompt)
 
     async def _call_claude_api(self, prompt: str) -> Result[str, ExternalServiceError]:
-        """Call Claude API via LangChain with error handling."""
+        """Call Claude API directly with error handling."""
         try:
             if self.is_demo_mode:
                 # Demo mode - return mock structured response
@@ -618,11 +590,11 @@ IMPORTANT GUIDELINES:
                 await asyncio.sleep(2)  # Simulate API processing time
                 return Ok(self._generate_demo_structured_response())
 
-            if not CLAUDE_API_AVAILABLE or not SystemMessage or not HumanMessage:
+            if not CLAUDE_API_AVAILABLE or not self.client:
                 # Fallback to demo mode if dependencies not available
                 return Err(ExternalServiceError("Claude API dependencies not available"))
 
-            # Create the message chain
+            # System prompt for structured analysis
             system_prompt = """You are an elite business and technical analyst with 15+ years of experience in software architecture, project management, and strategic planning. Your expertise spans:
 
             - Technical architecture and system design
@@ -648,18 +620,24 @@ IMPORTANT GUIDELINES:
 
             Think like a senior consultant who needs to brief executives and technical teams with precision and strategic insight."""
 
-            messages = [
-                SystemMessage(content=system_prompt),
-                HumanMessage(content=prompt)
-            ]
-
-            # Call Claude via LangChain
-            response = await self.langchain_client.ainvoke(messages)
+            # Call Claude API directly
+            response = self.client.messages.create(
+                model=settings.claude_model,
+                max_tokens=settings.claude_max_tokens,
+                temperature=0.3,  # Slightly creative for rich analysis
+                system=system_prompt,
+                messages=[{
+                    "role": "user",
+                    "content": prompt
+                }]
+            )
 
             if not response or not response.content:
                 return Err(ExternalServiceError("Empty response from Claude API"))
 
-            return Ok(response.content)
+            # Extract text from response
+            response_text = response.content[0].text if response.content else ""
+            return Ok(response_text)
 
         except anthropic.APIError as e:
             logger.error(f"Claude API error: {str(e)}")
@@ -1067,23 +1045,27 @@ IMPORTANT GUIDELINES:
                     "demo_mode": True
                 })
 
-            if not CLAUDE_API_AVAILABLE or not SystemMessage or not HumanMessage:
+            if not CLAUDE_API_AVAILABLE or not self.client:
                 return Err(ExternalServiceError("Claude API dependencies not available"))
 
             # Simple API test
-            test_messages = [
-                SystemMessage(content="You are a health check assistant."),
-                HumanMessage(content="Respond with exactly: HEALTHY")
-            ]
+            response = self.client.messages.create(
+                model=settings.claude_model,
+                max_tokens=50,
+                temperature=0.0,
+                messages=[{
+                    "role": "user",
+                    "content": "Respond with exactly: HEALTHY"
+                }]
+            )
 
-            response = await self.langchain_client.ainvoke(test_messages)
-
-            is_healthy = "HEALTHY" in response.content.upper()
+            response_text = response.content[0].text if response.content else ""
+            is_healthy = "HEALTHY" in response_text.upper()
 
             return Ok({
                 "claude_api_healthy": is_healthy,
                 "model": settings.claude_model,
-                "response_received": bool(response.content),
+                "response_received": bool(response_text),
                 "tested_at": datetime.now().isoformat()
             })
 

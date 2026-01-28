@@ -16,7 +16,7 @@ from ..models.schemas import (
 )
 from ..services.database_service import database_service
 from ..services.storage_service import storage_service
-from ..services.claude_service_minimal import claude_service
+from ..services.claude_service import claude_service
 from ..utils.result import Result, Ok, Err, RecordingError, ProcessingError
 from ..config.settings import settings
 
