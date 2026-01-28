@@ -35,7 +35,7 @@ class DatabaseService:
 
         # Handle different database types
         if "postgresql://" in database_url:
-            database_url = database_url.replace("postgresql://", "postgresql+asyncpg://")
+            database_url = database_url.replace("postgresql://", "postgresql+psycopg://")
 
         engine_kwargs = {
             "echo": settings.debug,  # Log SQL in debug mode

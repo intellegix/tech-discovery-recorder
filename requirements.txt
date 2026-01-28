@@ -8,8 +8,8 @@ gunicorn==21.2.0
 # Database
 sqlalchemy==2.0.0
 aiosqlite==0.19.0
-psycopg2-binary==2.9.7
-asyncpg==0.29.0
+psycopg[asyncio]==3.2.3
+# psycopg2-binary kept for compatibility, psycopg3 for async operations
 
 # AI/ML APIs
 anthropic==0.42.0
