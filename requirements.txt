@@ -1,8 +1,8 @@
 # FastAPI Backend Dependencies
 
 # FastAPI and ASGI server
-fastapi==0.100.0
-uvicorn[standard]==0.23.0
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
 gunicorn==21.2.0
 
 # Database
@@ -12,8 +12,8 @@ psycopg2-binary==2.9.7
 asyncpg==0.29.0
 
 # AI/ML APIs
-anthropic==0.75.0
-openai==2.14.0
+anthropic==0.42.0
+openai==1.57.2
 
 # Security and Authentication
 python-jose[cryptography]==3.3.0
@@ -24,8 +24,8 @@ python-multipart==0.0.6
 reportlab==4.0.7
 
 # Configuration and Environment
-pydantic==2.5.0
-pydantic-settings==2.0.3
+pydantic==2.10.3
+pydantic-settings==2.7.0
 python-dotenv==1.0.0
 
 # HTTP and Web
