@@ -3,8 +3,13 @@ Main FastAPI application for Tech Discovery Recorder.
 Implements the backend architecture from the plan.
 """
 
-import logging
+import sys
 import os
+
+# Ensure the src directory is on Python's import path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+import logging
 from contextlib import asynccontextmanager
 from typing import Dict, Any
 from fastapi import FastAPI, HTTPException, Request
