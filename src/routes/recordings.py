@@ -9,16 +9,16 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, B
 from fastapi.responses import JSONResponse
 import logging
 
-from ..models.schemas import (
+from models.schemas import (
     RecordingCreate, RecordingResponse, RecordingListResponse,
     ProcessingRequest, ProcessingStatusResponse, ExportData,
     ConsentProof, ProcessingTypeEnum, ErrorResponse
 )
-from ..services.database_service import database_service
-from ..services.storage_service import storage_service
-from ..services.claude_service import claude_service
-from ..utils.result import Result, Ok, Err, RecordingError, ProcessingError
-from ..config.settings import settings
+from services.database_service import database_service
+from services.storage_service import storage_service
+from services.claude_service import claude_service
+from utils.result import Result, Ok, Err, RecordingError, ProcessingError
+from config.settings import settings
 
 
 logger = logging.getLogger(__name__)
@@ -168,7 +168,7 @@ async def list_recordings(
         status_filter = None
         if status:
             try:
-                from ..models.database import ProcessingStatus
+                from models.database import ProcessingStatus
                 status_filter = ProcessingStatus(status)
             except ValueError:
                 raise HTTPException(status_code=400, detail=f"Invalid status: {status}")
@@ -270,7 +270,7 @@ async def process_recording(
         recording = recording_result.unwrap()
 
         # Check if already processing or completed
-        from ..models.database import ProcessingStatus
+        from models.database import ProcessingStatus
         if recording.processing_status == ProcessingStatus.PROCESSING:
             raise HTTPException(status_code=409, detail="Recording is already being processed")
 
@@ -401,7 +401,7 @@ async def _process_recording_background(
     custom_prompt: Optional[str]
 ):
     """Background task for processing recording with Claude."""
-    from ..models.database import ProcessingStatus
+    from models.database import ProcessingStatus
     try:
         logger.info(f"Starting background processing for recording {recording_id}")
 
@@ -474,7 +474,7 @@ async def _process_recording_background(
 
 def _recording_to_response(recording) -> RecordingResponse:
     """Convert database Recording model to response schema."""
-    from ..models.schemas import ConsentProofResponse, StructuredNotes
+    from models.schemas import ConsentProofResponse, StructuredNotes
 
     # Convert consent proof
     consent_data = recording.consent_proof

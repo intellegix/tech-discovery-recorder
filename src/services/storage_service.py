@@ -13,8 +13,8 @@ import boto3
 from botocore.exceptions import ClientError, NoCredentialsError
 import logging
 
-from ..config.settings import settings
-from ..utils.result import Result, Ok, Err, StorageError, wrap_result
+from config.settings import settings
+from utils.result import Result, Ok, Err, StorageError, wrap_result
 
 
 logger = logging.getLogger(__name__)

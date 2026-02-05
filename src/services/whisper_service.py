@@ -9,8 +9,8 @@ from typing import Optional, Dict, Any
 from pathlib import Path
 
 import openai
-from ..utils.result import Result, Ok, Err, ProcessingError
-from ..config.settings import settings
+from utils.result import Result, Ok, Err, ProcessingError
+from config.settings import settings
 
 logger = logging.getLogger(__name__)
 

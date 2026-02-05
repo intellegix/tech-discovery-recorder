@@ -12,12 +12,12 @@ from sqlalchemy import select, update, delete, func, and_, or_
 from sqlalchemy.exc import SQLAlchemyError
 import logging
 
-from ..config.settings import settings
-from ..models.database import Base, Recording, AuditLog, UserSession, ProcessingStatus, AuditAction
-from ..models.schemas import (
+from config.settings import settings
+from models.database import Base, Recording, AuditLog, UserSession, ProcessingStatus, AuditAction
+from models.schemas import (
     RecordingCreate, RecordingResponse, ConsentProofResponse, StructuredNotes
 )
-from ..utils.result import Result, Ok, Err, RecordingError, ValidationError
+from utils.result import Result, Ok, Err, RecordingError, ValidationError
 
 
 logger = logging.getLogger(__name__)

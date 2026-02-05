@@ -8,9 +8,9 @@ import logging
 from datetime import datetime
 from typing import Dict, Any, Optional, List
 
-from ..config.settings import settings
-from ..utils.result import Result, Ok, Err, ProcessingError, ExternalServiceError
-from ..models.schemas import StructuredNotes, ProcessingTypeEnum
+from config.settings import settings
+from utils.result import Result, Ok, Err, ProcessingError, ExternalServiceError
+from models.schemas import StructuredNotes, ProcessingTypeEnum
 
 
 logger = logging.getLogger(__name__)

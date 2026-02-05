@@ -48,7 +48,7 @@ def generate_uuid() -> str:
 # Database compatibility helpers
 def get_uuid_column():
     """Get UUID column type based on database."""
-    from ..config.settings import settings
+    from config.settings import settings
     if settings.is_sqlite:
         return Column(String(36), primary_key=True, default=generate_uuid)
     else:
@@ -56,7 +56,7 @@ def get_uuid_column():
 
 def get_array_column():
     """Get array column type based on database."""
-    from ..config.settings import settings
+    from config.settings import settings
     if settings.is_sqlite:
         return Column(JSON, nullable=False)  # Store as JSON array in SQLite
     else:

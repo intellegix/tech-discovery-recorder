@@ -8,11 +8,11 @@ from typing import Dict, Any, List
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 import logging
 
-from ..models.schemas import HealthResponse, StatsResponse, ErrorResponse
-from ..services.database_service import database_service
-from ..services.storage_service import storage_service
-from ..services.claude_service import claude_service
-from ..config.settings import settings
+from models.schemas import HealthResponse, StatsResponse, ErrorResponse
+from services.database_service import database_service
+from services.storage_service import storage_service
+from services.claude_service import claude_service
+from config.settings import settings
 
 
 logger = logging.getLogger(__name__)

@@ -18,9 +18,9 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, 
 from reportlab.platypus.flowables import HRFlowable
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_JUSTIFY
 
-from ..models.schemas import StructuredNotes
-from ..utils.result import Result, Ok, Err, ProcessingError
-from ..config.settings import settings
+from models.schemas import StructuredNotes
+from utils.result import Result, Ok, Err, ProcessingError
+from config.settings import settings
 
 logger = logging.getLogger(__name__)
 

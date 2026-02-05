@@ -14,10 +14,10 @@ from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 
-from .config.settings import settings
-from .services.database_service import database_service
-from .routes import recordings, admin
-from .utils.result import Result
+from config.settings import settings
+from services.database_service import database_service
+from routes import recordings, admin
+from utils.result import Result
 
 
 # Configure logging

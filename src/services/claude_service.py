@@ -28,9 +28,9 @@ except ImportError as e:
     anthropic = None
     CLAUDE_API_AVAILABLE = False
 
-from ..config.settings import settings
-from ..utils.result import Result, Ok, Err, ProcessingError, ExternalServiceError
-from ..models.schemas import StructuredNotes, ProcessingTypeEnum
+from config.settings import settings
+from utils.result import Result, Ok, Err, ProcessingError, ExternalServiceError
+from models.schemas import StructuredNotes, ProcessingTypeEnum
 
 # Import Whisper transcription service
 try:

@@ -11,10 +11,10 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.responses import FileResponse, JSONResponse
 
-from ..services.database_service import database_service
-from ..services.pdf_service import pdf_generator
-from ..utils.result import Result, Ok, Err
-from ..config.settings import settings
+from services.database_service import database_service
+from services.pdf_service import pdf_generator
+from utils.result import Result, Ok, Err
+from config.settings import settings
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/recordings", tags=["pdf-export"])
@@ -54,7 +54,7 @@ async def generate_pdf_report(
         recording = recording_result.unwrap()
 
         # Check if processing is complete
-        from ..models.database import ProcessingStatus
+        from models.database import ProcessingStatus
         if recording.processing_status != ProcessingStatus.COMPLETED:
             raise HTTPException(
                 status_code=400,
@@ -91,7 +91,7 @@ async def generate_pdf_report(
         }
 
         # Convert database structured notes to StructuredNotes object
-        from ..models.schemas import StructuredNotes
+        from models.schemas import StructuredNotes
         try:
             if isinstance(recording.structured_notes, dict):
                 structured_notes = StructuredNotes(**recording.structured_notes)

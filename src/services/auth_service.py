@@ -11,10 +11,10 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 import logging
 
-from ..config.settings import settings
-from ..models.database import UserSession
-from ..services.database_service import database_service
-from ..utils.result import Result, Ok, Err, AuthenticationError
+from config.settings import settings
+from models.database import UserSession
+from services.database_service import database_service
+from utils.result import Result, Ok, Err, AuthenticationError
 
 
 logger = logging.getLogger(__name__)
