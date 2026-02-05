@@ -7,6 +7,8 @@ services:
     rootDir: src
     healthCheckPath: /api/v1/health
     envVars:
+      - key: PYTHONPATH
+        value: "/opt/render/project/src/src"
       - key: DEBUG
         value: "false"
       - key: LOG_LEVEL
